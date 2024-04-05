@@ -62,7 +62,9 @@ uniform sampler2D uTexture;
 out vec4 outColor;
 
 void main() {
-    outColor = texture(uTexture, fragUV);
+    vec4 textureColor = texture(uTexture, fragUV);
+    vec4 baseColor = vec4(1.0, 0.0, 0.0, 1.0); // 红色
+    outColor = mix(baseColor, textureColor, textureColor.a); // 基于alpha值混合
 }
 )fragment";
 
@@ -257,7 +259,16 @@ void Renderer::updateRenderArea() {
 }
 
 /**
- * @brief 为这个演示创建我们想要的任何演示模型。
+ * @brief 创建并初始化模型
+ *
+ * 本函数用于在渲染器中创建和初始化一个正方形模型。它首先定义了正方形的四个顶点及其纹理坐标，
+ * 然后通过索引定义了构成正方形的两个三角形。此外，函数加载了一个名为"android_robot.png"的纹理图像，
+ * 并将这个纹理应用到正方形上。最后，创建的模型会被添加到模型列表中，以便后续渲染。
+ *
+ * 注意：此示例没有实现纹理管理，如果重用图像，应注意避免重复加载。
+ *
+ * @param 无
+ * @return 无
  */
 void Renderer::createModels() {
     aout << "执行函数 createModels" << std::endl;
