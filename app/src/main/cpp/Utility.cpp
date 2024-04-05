@@ -29,6 +29,47 @@ bool Utility::checkAndLogGlError(bool alwaysLog) {
     }
 }
 
+/**
+ * 生成一个透视投影矩阵
+ *
+ * @param outMatrix 输出矩阵
+ * @param fovY Y方向上的视场角度，以度为单位
+ * @param aspect 宽高比
+ * @param near 近平面距离
+ * @param far 远平面距离
+ * @return 生成的矩阵
+ */
+float *
+Utility::buildPerspectiveMatrix(float *outMatrix, float fovY, float aspect, float near, float far) {
+    const float DEG2RAD = 3.14159265f / 180.0f;
+    // 将fovY从度转换为弧度
+    float fovyInRadians = fovY * DEG2RAD;
+    float f = 1.0f / tan(fovyInRadians / 2.0f); // 焦距
+    float rangeInv = 1.0f / (near - far);
+
+    outMatrix[0] = f / aspect;
+    outMatrix[1] = 0.0f;
+    outMatrix[2] = 0.0f;
+    outMatrix[3] = 0.0f;
+
+    outMatrix[4] = 0.0f;
+    outMatrix[5] = f;
+    outMatrix[6] = 0.0f;
+    outMatrix[7] = 0.0f;
+
+    outMatrix[8] = 0.0f;
+    outMatrix[9] = 0.0f;
+    outMatrix[10] = (far + near) * rangeInv;
+    outMatrix[11] = -1.0f;
+
+    outMatrix[12] = 0.0f;
+    outMatrix[13] = 0.0f;
+    outMatrix[14] = 2.0f * far * near * rangeInv;
+    outMatrix[15] = 0.0f;
+
+    return outMatrix;
+}
+
 // 构建正交投影矩阵的函数
 float *
 Utility::buildOrthographicMatrix(float *outMatrix, float halfHeight, float aspect, float near,
@@ -178,5 +219,3 @@ void Utility::buildRotationMatrix3D(float *matrix, float angleXDegrees, float an
     // 然后，(Y * X) * Z
     multiplyMatrices(tempMatrix, rotateZ, matrix);
 }
-
-

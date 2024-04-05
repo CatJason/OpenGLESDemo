@@ -37,6 +37,24 @@ public:
             float far);
 
     /**
+     * 生成一个透视投影矩阵
+     *
+     * @param outMatrix 输出矩阵
+     * @param fovY Y方向上的视场角度，以度为单位
+     * @param aspect 宽高比
+     * @param near 近平面距离
+     * @param far 远平面距离
+     * @return 生成的矩阵
+     */
+    static float* buildPerspectiveMatrix(
+            float* outMatrix,
+            float fovY,
+            float aspect,
+            float near,
+            float far);
+
+
+    /**
      * 生成一个单位矩阵
      *
      * @param outMatrix 要写入的矩阵

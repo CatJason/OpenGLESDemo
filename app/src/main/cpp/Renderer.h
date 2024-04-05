@@ -50,8 +50,9 @@ private:
     /*!
      * @brief 每一帧我们都需要检查帧缓冲区的大小是否发生了变化。如果发生了变化，相应地更新视口
      */
-    void updateRenderArea();
+    void updateViewportAndProjectionMatrix();
 
+    void updateRenderArea();
     /*!
      * 为这个示例创建模型。在你的完整游戏中，你可能会从文件加载场景配置，
      * 或使用其他设置逻辑。

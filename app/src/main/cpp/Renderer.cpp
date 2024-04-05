@@ -260,8 +260,9 @@ void Renderer::initRenderer() {
     createModels();
 }
 
+
 void Renderer::updateRenderArea() {
-    aout << "执行函数 updateRenderArea" << std::endl;
+    aout << "执行函数 updateViewportAndProjectionMatrix" << std::endl;
     EGLint width;
     eglQuerySurface(display_, surface_, EGL_WIDTH, &width);
 
@@ -277,6 +278,39 @@ void Renderer::updateRenderArea() {
         shaderNeedsNewProjectionMatrix_ = true;
     }
 }
+
+
+void Renderer::updateViewportAndProjectionMatrix() {
+    aout << "执行函数 updateViewportAndProjectionMatrix" << std::endl;
+    EGLint width;
+    eglQuerySurface(display_, surface_, EGL_WIDTH, &width);
+
+    EGLint height;
+    eglQuerySurface(display_, surface_, EGL_HEIGHT, &height);
+
+    if (width != width_ || height != height_) {
+        width_ = width;
+        height_ = height;
+        glViewport(0, 0, width, height);
+
+        if (shader_) {
+            // 当视口大小改变时，更新投影矩阵
+            float projectionMatrix[16];
+            float fovY = 45.0f; // Y方向上的视场角度，以度为单位
+            float aspect = float(width) / height; // 纵横比
+            float zNear = 0.1f; // 近平面距离
+            float zFar = 100.0f; // 远平面距离
+            Utility::buildPerspectiveMatrix(projectionMatrix, fovY, aspect, zNear, zFar);
+
+            // 将新的投影矩阵发送到着色器
+            shader_->setProjectionMatrix(projectionMatrix);
+        }
+
+        // 确保矩阵不是每帧都生成
+        shaderNeedsNewProjectionMatrix_ = false;
+    }
+}
+
 
 /**
  * @brief 创建并初始化模型
