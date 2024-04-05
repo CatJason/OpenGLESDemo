@@ -115,3 +115,68 @@ void Utility::buildRotationMatrix(float *pDouble, float angle) {
     pDouble[10] = 1; // Z轴不变
     pDouble[15] = 1; // 齐次坐标保持不变
 }
+
+/**
+ * 乘法两个4x4矩阵。
+ *
+ * @param a 第一个4x4矩阵。
+ * @param b 第二个4x4矩阵。
+ * @param result 结果4x4矩阵。
+ */
+void multiplyMatrices(const float* a, const float* b, float* result) {
+    for (int row = 0; row < 4; row++) {
+        for (int col = 0; col < 4; col++) {
+            result[col * 4 + row] = 0.0f;
+            for (int k = 0; k < 4; k++) {
+                result[col * 4 + row] += a[k * 4 + row] * b[col * 4 + k];
+            }
+        }
+    }
+}
+
+
+void Utility::buildRotationMatrix3D(float *matrix, float angleXDegrees, float angleYDegrees, float angleZDegrees) {
+    float angleXRadians = angleXDegrees * (M_PI / 180.0f);
+    float angleYRadians = angleYDegrees * (M_PI / 180.0f);
+    float angleZRadians = angleZDegrees * (M_PI / 180.0f);
+
+    float cosX = cos(angleXRadians);
+    float sinX = sin(angleXRadians);
+    float cosY = cos(angleYRadians);
+    float sinY = sin(angleYRadians);
+    float cosZ = cos(angleZRadians);
+    float sinZ = sin(angleZRadians);
+
+    // 绕X轴旋转的矩阵
+    float rotateX[16] = {
+            1,    0,     0,    0,
+            0,  cosX, -sinX,  0,
+            0,  sinX,  cosX,  0,
+            0,    0,     0,    1
+    };
+
+    // 绕Y轴旋转的矩阵
+    float rotateY[16] = {
+            cosY,  0,  sinY,  0,
+            0,    1,    0,  0,
+            -sinY,  0,  cosY,  0,
+            0,    0,    0,  1
+    };
+
+    // 绕Z轴旋转的矩阵
+    float rotateZ[16] = {
+            cosZ, -sinZ,  0,  0,
+            sinZ,  cosZ,  0,  0,
+            0,     0,  1,  0,
+            0,     0,  0,  1
+    };
+
+    // 计算综合的旋转矩阵，顺序为Y*X*Z
+    float tempMatrix[16]; // 用于存储中间结果
+    // 首先，Y * X
+    multiplyMatrices(rotateY, rotateX, tempMatrix);
+    // 然后，(Y * X) * Z
+    multiplyMatrices(tempMatrix, rotateZ, matrix);
+}
+
+

@@ -23,14 +23,18 @@ union Vector2 {
     float idx[2]; // 通过索引访问相同的数据
 };
 
-// 顶点数据结构
-struct Vertex {
-    // 顶点构造函数，初始化顶点位置和纹理坐标
-    constexpr Vertex(const Vector3 &inPosition, const Vector2 &inUV) : position(inPosition),
-                                                                       uv(inUV) {}
+struct Vector4 {
+    float r, g, b, a;
+};
 
-    Vector3 position; // 顶点的位置
-    Vector2 uv;       // 顶点的纹理坐标
+struct Vertex {
+    Vector3 position; // Vertex position
+    Vector2 uv;       // Texture coordinates
+    Vector4 color;    // Vertex color
+
+    // Updated constructor to include color initialization
+    Vertex(const Vector3 &inPosition, const Vector2 &inUV)
+            : position(inPosition), uv(inUV) {}
 };
 
 typedef uint16_t Index; // 定义索引类型，用于索引缓冲

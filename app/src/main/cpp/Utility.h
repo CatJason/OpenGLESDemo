@@ -45,6 +45,8 @@ public:
     static float *buildIdentityMatrix(float *outMatrix);
 
     static void buildRotationMatrix(float pDouble[16], float angle);
+
+    static void buildRotationMatrix3D(float *matrix, float angleXDegrees, float angleYDegrees, float angleZDegrees );
 };
 
 #endif //ANDROIDGLINVESTIGATIONS_UTILITY_H

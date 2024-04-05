@@ -42,12 +42,17 @@ in vec3 inPosition;
 in vec2 inUV;
 
 out vec2 fragUV;
+out vec4 fragColor;
 
 uniform mat4 uProjection;
 uniform mat4 uRotation; // 新增旋转矩阵uniform
 
 void main() {
     fragUV = inUV;
+
+    // 基于顶点Y位置生成颜色
+    float y = (inPosition.y + 1.0) / 2.0; // 归一化Y坐标
+    fragColor = vec4(y, 1.0 - y, 0.5 + 0.5 * sin(3.14 * y), 1.0); // 生成颜色
     gl_Position = uProjection * uRotation * vec4(inPosition, 1.0); // 应用旋转
 }
 )vertex";
@@ -57,6 +62,7 @@ static const char *fragment = R"fragment(#version 300 es
 precision mediump float;
 
 in vec2 fragUV;
+in vec4 fragColor;
 
 uniform sampler2D uTexture;
 
@@ -64,8 +70,7 @@ out vec4 outColor;
 
 void main() {
     vec4 textureColor = texture(uTexture, fragUV);
-    vec4 baseColor = vec4(1.0, 0.0, 0.0, 1.0); // 红色
-    outColor = mix(baseColor, textureColor, textureColor.a); // 基于alpha值混合
+    outColor = mix(fragColor, textureColor, textureColor.a); // 基于alpha值混合
 }
 )fragment";
 
@@ -139,7 +144,8 @@ void Renderer::render() {
 
     // 计算旋转矩阵
     float rotationMatrix[16];
-    Utility::buildRotationMatrix(rotationMatrix, rotationAngle_);
+    // Utility::buildRotationMatrix(rotationMatrix, rotationAngle_);
+    Utility::buildRotationMatrix3D(rotationMatrix, rotationAngle_, rotationAngle_, rotationAngle_);
 
     // 设置旋转矩阵uniform
     shader_->setRotationMatrix(rotationMatrix);
@@ -284,25 +290,71 @@ void Renderer::updateRenderArea() {
  * @param 无
  * @return 无
  */
+
+
 void Renderer::createModels() {
     aout << "执行函数 createModels" << std::endl;
     /*
-     * 这是一个正方形：
-     * 0 --- 1
-     * | \   |
-     * |  \  |
-     * |   \ |
-     * 3 --- 2
+     * 这是一个正方体的顶点：
+     *    5----6
+     *   /|   /|
+     *  1----2 |
+     *  | 4--|-7
+     *  |/   |/
+     *  0----3
      */
+    // 修正的立方体顶点定义
+    float size = 0.5; // 将0.5提取为一个可调整的尺寸因子
     std::vector<Vertex> vertices = {
-            Vertex(Vector3{1, 1, 0}, Vector2{0, 0}), // 0
-            Vertex(Vector3{-1, 1, 0}, Vector2{1, 0}), // 1
-            Vertex(Vector3{-1, -1, 0}, Vector2{1, 1}), // 2
-            Vertex(Vector3{1, -1, 0}, Vector2{0, 1}) // 3
+        // Bottom face (Red)
+        Vertex{Vector3{-size, -size, -size}, Vector2{0.0, 0.0}}, // 0
+        Vertex{Vector3{size, -size, -size}, Vector2{1.0, 0.0}}, // 1
+        Vertex{Vector3{size, -size, size}, Vector2{1.0, 1.0}}, // 2
+        Vertex{Vector3{-size, -size, size}, Vector2{0.0, 1.0}}, // 3
+        // Top face (Green)
+        Vertex{Vector3{-size, size, -size}, Vector2{0.0, 0.0}}, // 4
+        Vertex{Vector3{size, size, -size}, Vector2{1.0, 0.0}}, // 5
+        Vertex{Vector3{size, size, size}, Vector2{1.0, 1.0}}, // 6
+        Vertex{Vector3{-size, size, size}, Vector2{0.0, 1.0}}, // 7
+        // Front face (Blue)
+        Vertex{Vector3{-size, -size, size}, Vector2{0.0, 0.0}}, // 8
+        Vertex{Vector3{size, -size, size}, Vector2{1.0, 0.0}}, // 9
+        Vertex{Vector3{size, size, size}, Vector2{1.0, 1.0}}, // 10
+        Vertex{Vector3{-size, size, size}, Vector2{0.0, 1.0}}, // 11
+        // Back face (Yellow)
+        Vertex{Vector3{-size, -size, -size}, Vector2{0.0, 0.0}}, // 12
+        Vertex{Vector3{size, -size, -size}, Vector2{1.0, 0.0}}, // 13
+        Vertex{Vector3{size, size, -size}, Vector2{1.0, 1.0}}, // 14
+        Vertex{Vector3{-size, size, -size}, Vector2{0.0, 1.0}}, // 15
+        // Right face (Cyan)
+        Vertex{Vector3{size, -size, -size}, Vector2{0.0, 0.0}}, // 16
+        Vertex{Vector3{size, size, -size}, Vector2{1.0, 0.0}}, // 17
+        Vertex{Vector3{size, size, size}, Vector2{1.0, 1.0}}, // 18
+        Vertex{Vector3{size, -size, size}, Vector2{0.0, 1.0}}, // 19
+        // Left face (Magenta)
+        Vertex{Vector3{-size, -size, -size}, Vector2{0.0, 0.0}}, // 20
+        Vertex{Vector3{-size, size, -size}, Vector2{1.0, 0.0}}, // 21
+        Vertex{Vector3{-size, size, size}, Vector2{1.0, 1.0}}, // 22
+        Vertex{Vector3{-size, -size, size}, Vector2{0.0, 1.0}}  // 23
     };
+
+
+// 修正的立方体索引定义
     std::vector<Index> indices = {
-            0, 1, 2, 0, 2, 3
+            // Bottom face
+            0, 1, 2,    0, 2, 3,
+            // Top face
+            4, 5, 6,    4, 6, 7,
+            // Front face
+            8, 9, 10,   8, 10, 11,
+            // Back face
+            12, 13, 14, 12, 14, 15,
+            // Right face
+            16, 17, 18, 16, 18, 19,
+            // Left face
+            20, 21, 22, 20, 22, 23
     };
+
 
     // 加载一个图像并将其分配给正方形。
     //
