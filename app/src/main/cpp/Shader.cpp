@@ -127,6 +127,11 @@ void Shader::deactivate() const {
     glUseProgram(0);
 }
 
+void Shader::setRotationMatrix(const float* rotationMatrix) {
+    GLint rotationMatrixUniform = glGetUniformLocation(program_, "uRotation");
+    glUniformMatrix4fv(rotationMatrixUniform, 1, GL_FALSE, rotationMatrix);
+}
+
 // 绘制模型
 void Shader::drawModel(const Model &model) const {
     aout << "执行函数 drawModel" << std::endl;

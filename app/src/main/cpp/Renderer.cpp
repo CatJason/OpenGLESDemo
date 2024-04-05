@@ -44,10 +44,11 @@ in vec2 inUV;
 out vec2 fragUV;
 
 uniform mat4 uProjection;
+uniform mat4 uRotation; // 新增旋转矩阵uniform
 
 void main() {
     fragUV = inUV;
-    gl_Position = uProjection * vec4(inPosition, 1.0);
+    gl_Position = uProjection * uRotation * vec4(inPosition, 1.0); // 应用旋转
 }
 )vertex";
 
@@ -67,6 +68,8 @@ void main() {
     outColor = mix(baseColor, textureColor, textureColor.a); // 基于alpha值混合
 }
 )fragment";
+
+float rotationAngle_ = 0.0f; // 旋转角度
 
 /*!
  * 投影矩阵高度的一半。这给你提供了一个高度为4的可渲染区域，范围从-2到2
@@ -129,6 +132,17 @@ void Renderer::render() {
         // 确保矩阵不是每帧都生成
         shaderNeedsNewProjectionMatrix_ = false;
     }
+
+    // 更新旋转角度
+    rotationAngle_ += 1.0f; // 每帧旋转1度，你可以根据需要调整这个值
+    if(rotationAngle_ >= 360.0f) rotationAngle_ -= 360.0f; // 防止溢出
+
+    // 计算旋转矩阵
+    float rotationMatrix[16];
+    Utility::buildRotationMatrix(rotationMatrix, rotationAngle_);
+
+    // 设置旋转矩阵uniform
+    shader_->setRotationMatrix(rotationMatrix);
 
     // 清除颜色缓冲区
     glClear(GL_COLOR_BUFFER_BIT);

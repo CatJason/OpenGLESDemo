@@ -61,6 +61,8 @@ public:
      */
     void setProjectionMatrix(float *projectionMatrix) const;
 
+    void setRotationMatrix(const float *rotationMatrix);
+
 private:
     /*!
      * 加载给定类型的着色器的辅助函数

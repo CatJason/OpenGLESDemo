@@ -43,6 +43,8 @@ public:
      * @return 生成的单位矩阵
      */
     static float *buildIdentityMatrix(float *outMatrix);
+
+    static void buildRotationMatrix(float pDouble[16], float angle);
 };
 
 #endif //ANDROIDGLINVESTIGATIONS_UTILITY_H

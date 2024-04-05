@@ -92,3 +92,26 @@ float *Utility::buildIdentityMatrix(float *outMatrix) {
 
     return outMatrix;
 }
+
+/**
+     * 构建一个绕Z轴旋转的矩阵。
+     *
+     * @param matrix 存储结果的4x4矩阵。
+     * @param angleDegrees 旋转的角度，以度为单位。
+     */
+void Utility::buildRotationMatrix(float *pDouble, float angle) {
+    float angleRadians = angle * (M_PI / 180.0f); // 将角度转换为弧度
+    float cosAngle = cos(angleRadians);
+    float sinAngle = sin(angleRadians);
+
+    // 清空矩阵
+    std::fill_n(pDouble, 16, 0.0f);
+
+    // 填充旋转矩阵
+    pDouble[0] = cosAngle;
+    pDouble[1] = sinAngle;
+    pDouble[4] = -sinAngle;
+    pDouble[5] = cosAngle;
+    pDouble[10] = 1; // Z轴不变
+    pDouble[15] = 1; // 齐次坐标保持不变
+}
