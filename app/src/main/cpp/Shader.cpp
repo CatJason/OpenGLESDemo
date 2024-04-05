@@ -131,38 +131,23 @@ void Shader::setRotationMatrix(const float* rotationMatrix) {
     GLint rotationMatrixUniform = glGetUniformLocation(program_, "uRotation");
     glUniformMatrix4fv(rotationMatrixUniform, 1, GL_FALSE, rotationMatrix);
 }
-
-// 绘制模型
 void Shader::drawModel(const Model &model) const {
     aout << "执行函数 drawModel" << std::endl;
+
     // 设置顶点属性
-    glVertexAttribPointer(
-            position_, // 属性位置
-            3, // 元素个数
-            GL_FLOAT, // 类型
-            GL_FALSE, // 是否标准化
-            sizeof(Vertex), // 步长
-            model.getVertexData() // 数据来源
-    );
+    glVertexAttribPointer(position_, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), model.getVertexData());
     glEnableVertexAttribArray(position_);
 
-    // 设置uv属性
-    glVertexAttribPointer(
-            uv_, // 属性位置
-            2, // 元素个数
-            GL_FLOAT, // 类型
-            GL_FALSE, // 是否标准化
-            sizeof(Vertex), // 步长
-            ((uint8_t *) model.getVertexData()) + sizeof(Vector3) // 数据偏移
-    );
+    // 设置UV属性
+    glVertexAttribPointer(uv_, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), ((uint8_t *)model.getVertexData()) + sizeof(Vector3));
     glEnableVertexAttribArray(uv_);
 
     // 设置纹理
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, model.getTexture().getTextureID());
 
-    // 以索引三角形的形式绘制
-    glDrawElements(GL_TRIANGLES, model.getIndexCount(), GL_UNSIGNED_SHORT, model.getIndexData());
+    // 使用模型指定的绘制模式绘制
+    glDrawElements(model.getMode(), model.getIndexCount(), GL_UNSIGNED_SHORT, model.getIndexData());
 
     // 禁用属性
     glDisableVertexAttribArray(uv_);

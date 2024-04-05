@@ -294,59 +294,52 @@ void Renderer::updateRenderArea() {
 
 void Renderer::createModels() {
     aout << "执行函数 createModels" << std::endl;
-    /*
-     * 这是一个正方体的顶点：
-     *    5----6
-     *   /|   /|
-     *  1----2 |
-     *  | 4--|-7
-     *  |/   |/
-     *  0----3
-     */
-    // 修正的立方体顶点定义
-    float size = 0.5; // 将0.5提取为一个可调整的尺寸因子
+
+    // 定义立方体的尺寸
+    float size = 0.5f; // 立方体边长的一半
+
+    // 立方体顶点定义，每个面的四个顶点
     std::vector<Vertex> vertices = {
-        // Bottom face (Red)
-        Vertex{Vector3{-size, -size, -size}, Vector2{0.0, 0.0}}, // 0
-        Vertex{Vector3{size, -size, -size}, Vector2{1.0, 0.0}}, // 1
-        Vertex{Vector3{size, -size, size}, Vector2{1.0, 1.0}}, // 2
-        Vertex{Vector3{-size, -size, size}, Vector2{0.0, 1.0}}, // 3
-        // Top face (Green)
-        Vertex{Vector3{-size, size, -size}, Vector2{0.0, 0.0}}, // 4
-        Vertex{Vector3{size, size, -size}, Vector2{1.0, 0.0}}, // 5
-        Vertex{Vector3{size, size, size}, Vector2{1.0, 1.0}}, // 6
-        Vertex{Vector3{-size, size, size}, Vector2{0.0, 1.0}}, // 7
-        // Front face (Blue)
-        Vertex{Vector3{-size, -size, size}, Vector2{0.0, 0.0}}, // 8
-        Vertex{Vector3{size, -size, size}, Vector2{1.0, 0.0}}, // 9
-        Vertex{Vector3{size, size, size}, Vector2{1.0, 1.0}}, // 10
-        Vertex{Vector3{-size, size, size}, Vector2{0.0, 1.0}}, // 11
-        // Back face (Yellow)
-        Vertex{Vector3{-size, -size, -size}, Vector2{0.0, 0.0}}, // 12
-        Vertex{Vector3{size, -size, -size}, Vector2{1.0, 0.0}}, // 13
-        Vertex{Vector3{size, size, -size}, Vector2{1.0, 1.0}}, // 14
-        Vertex{Vector3{-size, size, -size}, Vector2{0.0, 1.0}}, // 15
-        // Right face (Cyan)
-        Vertex{Vector3{size, -size, -size}, Vector2{0.0, 0.0}}, // 16
-        Vertex{Vector3{size, size, -size}, Vector2{1.0, 0.0}}, // 17
-        Vertex{Vector3{size, size, size}, Vector2{1.0, 1.0}}, // 18
-        Vertex{Vector3{size, -size, size}, Vector2{0.0, 1.0}}, // 19
-        // Left face (Magenta)
-        Vertex{Vector3{-size, -size, -size}, Vector2{0.0, 0.0}}, // 20
-        Vertex{Vector3{-size, size, -size}, Vector2{1.0, 0.0}}, // 21
-        Vertex{Vector3{-size, size, size}, Vector2{1.0, 1.0}}, // 22
-        Vertex{Vector3{-size, -size, size}, Vector2{0.0, 1.0}}  // 23
+            // Bottom face (0, 1, 2, 3)
+            Vertex{Vector3{-size, -size, -size}, Vector2{0.0f, 0.0f}},
+            Vertex{Vector3{size, -size, -size}, Vector2{1.0f, 0.0f}},
+            Vertex{Vector3{size, -size, size}, Vector2{1.0f, 1.0f}},
+            Vertex{Vector3{-size, -size, size}, Vector2{0.0f, 1.0f}},
+            // Top face (4, 5, 6, 7)
+            Vertex{Vector3{-size, size, -size}, Vector2{0.0f, 0.0f}},
+            Vertex{Vector3{size, size, -size}, Vector2{1.0f, 0.0f}},
+            Vertex{Vector3{size, size, size}, Vector2{1.0f, 1.0f}},
+            Vertex{Vector3{-size, size, size}, Vector2{0.0f, 1.0f}},
+            // Front face (8, 9, 10, 11) - Reusing top and bottom vertices
+            Vertex{Vector3{-size, -size, size}, Vector2{0.0f, 0.0f}},
+            Vertex{Vector3{size, -size, size}, Vector2{1.0f, 0.0f}},
+            Vertex{Vector3{size, size, size}, Vector2{1.0f, 1.0f}},
+            Vertex{Vector3{-size, size, size}, Vector2{0.0f, 1.0f}},
+            // Back face (12, 13, 14, 15) - Reusing top and bottom vertices
+            Vertex{Vector3{-size, -size, -size}, Vector2{0.0f, 0.0f}},
+            Vertex{Vector3{size, -size, -size}, Vector2{1.0f, 0.0f}},
+            Vertex{Vector3{size, size, -size}, Vector2{1.0f, 1.0f}},
+            Vertex{Vector3{-size, size, -size}, Vector2{0.0f, 1.0f}},
+            // Right face (16, 17, 18, 19) - Reusing front and back vertices
+            Vertex{Vector3{size, -size, -size}, Vector2{0.0f, 0.0f}},
+            Vertex{Vector3{size, size, -size}, Vector2{1.0f, 0.0f}},
+            Vertex{Vector3{size, size, size}, Vector2{1.0f, 1.0f}},
+            Vertex{Vector3{size, -size, size}, Vector2{0.0f, 1.0f}},
+            // Left face (20, 21, 22, 23) - Reusing front and back vertices
+            Vertex{Vector3{-size, -size, -size}, Vector2{0.0f, 0.0f}},
+            Vertex{Vector3{-size, size, -size}, Vector2{1.0f, 0.0f}},
+            Vertex{Vector3{-size, size, size}, Vector2{1.0f, 1.0f}},
+            Vertex{Vector3{-size, -size, size}, Vector2{0.0f, 1.0f}}
     };
 
-
-// 修正的立方体索引定义
+    // 立方体索引定义
     std::vector<Index> indices = {
             // Bottom face
-            0, 1, 2,    0, 2, 3,
+            0, 1, 2, 0, 2, 3,
             // Top face
-            4, 5, 6,    4, 6, 7,
+            4, 5, 6, 4, 6, 7,
             // Front face
-            8, 9, 10,   8, 10, 11,
+            8, 9, 10, 8, 10, 11,
             // Back face
             12, 13, 14, 12, 14, 15,
             // Right face
@@ -355,16 +348,28 @@ void Renderer::createModels() {
             20, 21, 22, 20, 22, 23
     };
 
+    // 描边的顶点定义（使用原有顶点，重点在于定义线段）
+    std::vector<Vertex> borderVertices = vertices; // 描边使用相同的顶点
 
-    // 加载一个图像并将其分配给正方形。
-    //
-    // 注意：这个示例中没有纹理管理，所以如果你重用一个图像，请小心不要重复加载它。
-    // 由于你得到了一个shared_ptr，你可以安全地在许多模型中重用它。
+    // 描边的索引（定义为线段）
+    std::vector<Index> borderIndices = {
+            0, 1, 1, 2, 2, 3, 3, 0, // Bottom face
+            4, 5, 5, 6, 6, 7, 7, 4, // Top face
+            0, 4, 1, 5, 2, 6, 3, 7  // Connecting edges
+    };
+
+    // 加载一个图像纹理
     auto assetManager = app_->activity->assetManager;
     auto spAndroidRobotTexture = TextureAsset::loadAsset(assetManager, "android_robot.png");
 
-    // 创建一个模型并将其放在渲染列表的后面。
-    models_.emplace_back(vertices, indices, spAndroidRobotTexture);
+    // 创建并添加立方体模型
+    models_.emplace_back(vertices, indices, spAndroidRobotTexture, GL_TRIANGLES);
+
+    // 创建纯色纹理
+    auto spGoldTexture = TextureAsset::createSolidColorTexture(255, 215, 0, 255);
+
+    // 创建并添加立方体的描边模型
+    models_.emplace_back(borderVertices, borderIndices, spGoldTexture, GL_LINES);
 }
 
 void Renderer::handleInput() {

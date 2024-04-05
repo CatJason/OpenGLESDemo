@@ -42,14 +42,21 @@ typedef uint16_t Index; // 定义索引类型，用于索引缓冲
 // 模型类，包含顶点、索引和纹理资产
 class Model {
 public:
-    // 模型的构造函数，接收顶点列表、索引列表和纹理资源
-    inline Model(
+    // 模型的构造函数，接收顶点列表、索引列表、纹理资源和可选的绘制模式
+    Model(
             std::vector<Vertex> vertices,
             std::vector<Index> indices,
-            std::shared_ptr<TextureAsset> spTexture)
+            std::shared_ptr<TextureAsset> spTexture,
+            GLenum mode) // 默认绘制模式为GL_TRIANGLES
             : vertices_(std::move(vertices)),
               indices_(std::move(indices)),
-              spTexture_(std::move(spTexture)) {}
+              spTexture_(std::move(spTexture)),
+              mode_(mode) {} // 初始化绘制模式
+
+    // 获取OpenGL绘制模式的方法
+    inline GLenum getMode() const {
+        return mode_;
+    }
 
     // 获取顶点数据的只读访问方法
     inline const Vertex *getVertexData() const {
@@ -75,6 +82,7 @@ private:
     std::vector<Vertex> vertices_; // 存储模型顶点的容器
     std::vector<Index> indices_;   // 存储顶点索引的容器
     std::shared_ptr<TextureAsset> spTexture_; // 模型纹理的智能指针
+    GLenum mode_; // OpenGL绘制模式
 };
 
 #endif //ANDROIDGLINVESTIGATIONS_MODEL_H

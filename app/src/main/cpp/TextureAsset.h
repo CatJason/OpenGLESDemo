@@ -26,8 +26,34 @@ public:
      */
     constexpr GLuint getTextureID() const { return textureID_; }
 
+    // 创建一个单色的纹理
+    static std::shared_ptr<TextureAsset> createSolidColorTexture(GLubyte r, GLubyte g, GLubyte b, GLubyte a) {
+        GLuint textureId;
+        glGenTextures(1, &textureId);
+        glBindTexture(GL_TEXTURE_2D, textureId);
+
+        // 创建一个1x1像素的纹理
+        GLubyte pixel[4] = {r, g, b, a};
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixel);
+
+        // 设置纹理参数
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+        // 解绑纹理
+        glBindTexture(GL_TEXTURE_2D, 0);
+
+        // 创建并返回TextureAsset对象
+        return create(textureId);
+    }
+
 private:
     inline TextureAsset(GLuint textureId) : textureID_(textureId) {} // 构造函数，私有化以限制创建方式
+    static std::shared_ptr<TextureAsset> create(GLuint textureId) {
+        return std::shared_ptr<TextureAsset>(new TextureAsset(textureId));
+    }
 
     GLuint textureID_; // OpenGL纹理ID
 };
