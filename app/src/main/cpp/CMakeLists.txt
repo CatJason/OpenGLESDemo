@@ -13,7 +13,22 @@ add_library(openglesdemo SHARED
         Renderer.cpp
         Shader.cpp
         TextureAsset.cpp
-        Utility.cpp)
+        Utility.cpp
+        jsoncpp/json_tool.h
+        jsoncpp/json_reader.cpp
+        jsoncpp/json_valueiterator.inl
+        jsoncpp/json_value.cpp
+        jsoncpp/json_writer.cpp
+        jsoncpp/json/assertions.h
+        jsoncpp/json/allocator.h
+        jsoncpp/json/config.h
+        jsoncpp/json/json_features.h
+        jsoncpp/json/forwards.h
+        jsoncpp/json/json.h
+        jsoncpp/json/reader.h
+        jsoncpp/json/value.h
+        jsoncpp/json/version.h
+        jsoncpp/json/writer.h)
 
 # Searches for a package provided by the game activity dependency
 find_package(game-activity REQUIRED CONFIG)
@@ -31,11 +46,3 @@ target_link_libraries(openglesdemo
         android
         log)
 
-# 添加jsoncpp目录
-add_subdirectory(${CMAKE_SOURCE_DIR}/jsoncpp)
-
-# 包含jsoncpp头文件
-include_directories(${CMAKE_SOURCE_DIR}/jsoncpp/include)
-
-# 确保链接jsoncpp库
-target_link_libraries(your_target_name jsoncpp_lib)
