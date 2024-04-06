@@ -30,3 +30,12 @@ target_link_libraries(openglesdemo
         jnigraphics
         android
         log)
+
+# 添加jsoncpp目录
+add_subdirectory(${CMAKE_SOURCE_DIR}/jsoncpp)
+
+# 包含jsoncpp头文件
+include_directories(${CMAKE_SOURCE_DIR}/jsoncpp/include)
+
+# 确保链接jsoncpp库
+target_link_libraries(your_target_name jsoncpp_lib)
