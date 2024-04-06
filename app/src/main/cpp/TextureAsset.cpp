@@ -1,7 +1,13 @@
-#include <android/imagedecoder.h>
 #include "TextureAsset.h"
 #include "AndroidOut.h"
 #include "Utility.h"
+#include "jsoncpp/json/json.h"
+
+#include <android/imagedecoder.h>
+#include <fstream>
+#include <iostream>
+#include <vector>
+#include <string>
 
 // 加载资源的函数，使用共享指针管理TextureAsset资源
 std::shared_ptr<TextureAsset>
@@ -73,6 +79,76 @@ TextureAsset::loadAsset(AAssetManager *assetManager, const std::string &assetPat
 
     // 创建共享指针，以便易于/自动清理
     return std::shared_ptr<TextureAsset>(new TextureAsset(textureId));
+}
+
+void TextureAsset::processGltfFile(const std::string& gltfFilename) {
+    std::ifstream jsonFile(gltfFilename, std::ios::binary);
+    Json::Value json;
+
+    try {
+        jsonFile >> json;
+    } catch (const std::exception& e) {
+        std::cerr << "Json parsing error: " << e.what() << std::endl;
+    }
+    jsonFile.close();
+
+    std::string binFilename = json["buffers"][0]["uri"].asString();
+    std::ifstream binFile(binFilename, std::ios::binary | std::ios::ate);
+    size_t binLength = binFile.tellg();
+    binFile.seekg(0);
+
+    std::vector<char> bin(binLength);
+    binFile.read(bin.data(), binLength);
+    binFile.close();
+
+    Json::Value& primitive = json["meshes"][0]["primitives"][0];
+    Json::Value& positionAccessor = json["accessors"][primitive["attributes"]["POSITION"].asInt()];
+    Json::Value& bufferView = json["bufferViews"][positionAccessor["bufferView"].asInt()];
+
+    float* buffer = (float*)(bin.data() + bufferView["byteOffset"].asInt());
+
+    for (int i = 0; i < positionAccessor["count"].asInt(); ++i) {
+        std::cout << "(" << buffer[i*3] << ", " << buffer[i*3 + 1] << ", " << buffer[i*3 + 2] << ")" << std::endl;
+    }
+
+    std::cout << "Vertices: " << positionAccessor["count"].asInt() << std::endl;
+}
+
+void TextureAsset::processGlbFile(const std::string& glbFilename) {
+    std::ifstream binFile(glbFilename, std::ios::binary);
+    binFile.seekg(12);
+
+    uint32_t jsonLength;
+    binFile.read(reinterpret_cast<char*>(&jsonLength), sizeof(jsonLength));
+
+    std::string jsonStr(jsonLength, ' ');
+    binFile.seekg(20);
+    binFile.read(&jsonStr[0], jsonLength);
+
+    Json::Value json;
+    Json::Reader reader;
+    if (!reader.parse(jsonStr, json)) {
+        std::cerr << "Problem parsing json: " << jsonStr << std::endl;
+    }
+
+    uint32_t binLength;
+    binFile.read(reinterpret_cast<char*>(&binLength), sizeof(binLength));
+    binFile.seekg(sizeof(uint32_t), std::ios_base::cur);
+
+    std::vector<char> bin(binLength);
+    binFile.read(bin.data(), binLength);
+
+    Json::Value& primitive = json["meshes"][0]["primitives"][0];
+    Json::Value& positionAccessor = json["accessors"][primitive["attributes"]["POSITION"].asInt()];
+    Json::Value& bufferView = json["bufferViews"][positionAccessor["bufferView"].asInt()];
+
+    float* buffer = (float*)(bin.data() + bufferView["byteOffset"].asInt());
+
+    for (int i = 0; i < positionAccessor["count"].asInt(); ++i) {
+        std::cout << "(" << buffer[i*3] << ", " << buffer[i*3 + 1] << ", " << buffer[i*3 + 2] << ")" << std::endl;
+    }
+
+    std::cout << "Vertices: " << positionAccessor["count"].asInt() << std::endl;
 }
 
 TextureAsset::~TextureAsset() {

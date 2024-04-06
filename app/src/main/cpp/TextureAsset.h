@@ -19,6 +19,9 @@ public:
     static std::shared_ptr<TextureAsset>
     loadAsset(AAssetManager *assetManager, const std::string &assetPath);
 
+    void processGltfFile(const std::string &gltfFilename);
+    void processGlbFile(const std::string &glbFilename);
+
     ~TextureAsset(); // 析构函数，用于资源清理
 
     /*!
